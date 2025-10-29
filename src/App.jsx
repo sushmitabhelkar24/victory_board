@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Football from "./images/football.jpg";
+import Score from "./components/Score";
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
+  const [scoreR, setScoreR] = useState(0);
+  const [scoreM, setScoreM] = useState(0);
+  const [winner, setWinner] = useState(null);
 
-  const [scoreR,setScoreR] = useState(0);
-  const [scoreM,setScoreM] = useState(0);
+  useEffect(() => {
+    const MAX_SCORE = 10;
+    if (scoreM < MAX_SCORE && scoreR < MAX_SCORE) {
+      return;
+    }
+    if (scoreR === MAX_SCORE) {
+      setWinner("Team R");
+      toast.success("Team Ronaldo wins");
+    }
+    if (scoreM === MAX_SCORE) {
+      setWinner("Team M");
+      toast.success("Team Messi wins");
+    }
+  }, [scoreR, scoreM]);
 
   return (
     <>
@@ -17,33 +34,54 @@ function App() {
             🏀🏆Victory Board🏆🏀
           </h1>
           <div className="flex flex-col w-auto md:flex-row justify-around">
-            <div className="h-50 w-65 md:h-60 bg-red-300 md:w-100 my-6 mx-4">
-              <h2 className="text-center text-xl md:text-3xl font-bold py-2 text-red-800 ">
-                Team Ronaldo
-              </h2>
-              <h3 className="text-center text-4xl md:text-6xl py-8 text-red-800">{scoreR}</h3>
-              <div className="flex flex-row justify-around">
-                <button className="text-4xl md:text-5xl" onClick={() => {setScoreR(scoreR + 1)}}>+</button>
-                <button className="text-4xl md:text-5xl" onClick={() => {setScoreR(scoreR - 1)}}>-</button>
-              </div>
-            </div>
-            
-            <div className="h-50 w-65 md:h-60 bg-red-300 md:w-100 my-6 mx-4">
-              <h2 className="text-center text-xl md:text-3xl font-bold py-2 text-purple-800">
-                Team Messi
-              </h2>
-              <h3 className="text-center text-4xl md:text-6xl py-8 text-purple-800">{scoreM}</h3>
-              <div className="flex flex-row justify-around">
-                <button className="text-4xl md:text-5xl" onClick={() => {setScoreM(scoreM + 1)}}>+</button>
-                <button className="text-4xl md:text-5xl" onClick={() => {setScoreM(scoreM - 1)}}>-</button>
-              </div>
-            </div>
+            <Score
+              teamName="Team Ronaldo"
+              score={scoreR}
+              addBtn={() => {
+                setScoreR(scoreR + 1);
+              }}
+              minusBtn={() => {
+                setScoreR(scoreR - 1);
+              }}
+              color="text-red-800"
+              isWinner={winner === "Team R"}
+              isWin={winner}
+            />
+            <Score
+              teamName="Team Messi"
+              score={scoreM}
+              addBtn={() => {
+                setScoreM(scoreM + 1);
+              }}
+              minusBtn={() => {
+                setScoreM(scoreM - 1);
+              }}
+              color="text-blue-800"
+              isWinner={winner === "Team M"}
+              isWin={winner}
+            />
           </div>
-          <button className="bg-green-600 h-9 w-20 md:h-10 md:w-30 rounded-2xl border-2 border-black border-dashed block mx-auto text-[16px] md:text-2xl px-2 text-white font-bold" onClick={() => {setScoreR(0);
-            setScoreM(0)
-          }}>Replay</button>
+
+          {winner ? (
+            <p className="text-center text-[14px]mt-0">
+              YEAH....<b>{winner} wins🏆🏆...</b> To play again click on
+              Replay..
+            </p>
+          ) : null}
+
+          <button
+            className="bg-green-600 h-9 w-20 md:h-10 md:w-30 rounded-2xl border-2 border-black border-dashed block mx-auto text-[16px] md:text-2xl px-2 text-white font-bold"
+            onClick={() => {
+              setScoreR(0);
+              setScoreM(0);
+              setWinner(null)
+            }}
+          >
+            Replay
+          </button>
         </div>
       </div>
+      <Toaster />
     </>
   );
 }
